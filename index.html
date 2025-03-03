@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Space Dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            overflow: hidden;
+        }
+        #gameContainer { 
+            display: flex; 
+            align-items: flex-start; 
+            position: relative; 
+        }
+        #gameCanvas { 
+            width: 500px; 
+            height: 400px; 
+            border: 2px solid black; 
+            background: #1a1a2e; 
+            position: relative; 
+            margin-right: 20px; 
+            overflow: hidden; 
+            transition: background 0.3s ease; 
+        }
+        #spaceship { 
+            position: absolute; 
+            bottom: 10px; 
+            font-size: 30px; 
+            line-height: 30px; 
+            width: 30px; 
+            height: 30px; 
+            text-align: center; 
+            padding: 0; 
+            margin: 0; 
+        }
+        .asteroid { 
+            position: absolute; 
+            font-size: 25px; 
+            line-height: 25px; 
+            width: 25px; 
+            height: 25px; 
+            text-align: center; 
+        }
+        .boss { 
+            position: absolute; 
+            font-size: 50px; 
+            line-height: 50px; 
+            width: 50px; 
+            height: 50px; 
+            text-align: center; 
+            color: #ff4444; 
+        }
+        #stats { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+        }
+        #scoreBoostDisplay { 
+            position: absolute; 
+            top: 30px; 
+            left: 10px; 
+            font-size: 14px; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+        }
+        #shop { 
+            width: 200px; 
+            padding: 10px; 
+            background: #2e2e4e; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            border: 2px solid black; 
+        }
+        #shop h3 { 
+            margin: 0 0 10px 0; 
+        }
+        #coinCount { 
+            margin-bottom: 15px; 
+        }
+        #shieldCount { 
+            margin-bottom: 10px; 
+            font-size: 18px; 
+        }
+        #powerTimers { 
+            margin-bottom: 10px; 
+            font-size: 16px; 
+        }
+        #shooterLevel { 
+            margin-bottom: 10px; 
+            font-size: 16px; 
+        }
+        .shopBtn { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 5px 10px; 
+            border: none; 
+            cursor: pointer; 
+            margin: 5px 0; 
+            display: block; 
+            width: 100%; 
+        }
+        .shopBtn:disabled { 
+            background: #888; 
+            cursor: not-allowed; 
+        }
+        #pauseText { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            color: white; 
+            font-size: 24px; 
+            font-family: Arial, sans-serif; 
+            display: none; 
+        }
+        #highScore { 
+            position: absolute; 
+            top: 50px; 
+            left: 10px; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            font-size: 14px; 
+        }
+        #skinMenu { 
+            margin-bottom: 10px; 
+        }
+        #skinSelect { 
+            width: 100%; 
+            padding: 5px; 
+            font-size: 14px; 
+        }
+        #codeInputContainer { 
+            margin-bottom: 10px; 
+        }
+        #codeInput { 
+            width: 70%; 
+            padding: 5px; 
+            font-size: 14px; 
+        }
+        #submitCodeBtn { 
+            width: 25%; 
+            padding: 5px; 
+            font-size: 14px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+        }
+        #submitCodeBtn:disabled { 
+            background: #888; 
+            cursor: not-allowed; 
+        }
+        #accountControls { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+        }
+        #accountControls button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 5px 10px; 
+            border: none; 
+            cursor: pointer; 
+            margin-left: 5px; 
+        }
+        #accountForm { 
+            display: none; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: #2e2e4e; 
+            padding: 20px; 
+            border: 2px solid black; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+        }
+        #accountForm input { 
+            display: block; 
+            width: 100%; 
+            padding: 5px; 
+            margin: 5px 0; 
+            font-size: 14px; 
+        }
+        #accountForm button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 5px 10px; 
+            border: none; 
+            cursor: pointer; 
+            margin: 5px 0; 
+            width: 100%; 
+        }
+        #accountStatus { 
+            margin-top: 10px; 
+            font-size: 14px; 
+        }
+        #ownerMenu { 
+            display: none; 
+            position: absolute; 
+            top: 50px; 
+            right: 10px; 
+            background: #2e2e4e; 
+            padding: 5px; 
+            border: 2px solid black; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            width: 150px; 
+        }
+        #ownerMenu h3 { 
+            margin: 0 0 5px 0; 
+            font-size: 14px; 
+            cursor: pointer; 
+        }
+        #codeInputs { 
+            display: none; 
+        }
+        #ownerMenu input { 
+            width: 60%; 
+            padding: 3px; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #ownerMenu button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 3px; 
+            border: none; 
+            cursor: pointer; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #ownerMenu .deleteBtn { 
+            background: #ff4444; 
+            width: 20%; 
+        }
+        #codeList { 
+            margin-top: 5px; 
+            max-height: 100px; 
+            overflow-y: auto; 
+            display: none; 
+        }
+        #codeList div { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #levelsMenu { 
+            position: absolute; 
+            bottom: -80px; 
+            left: 10px; 
+            background: #2e2e4e; 
+            padding: 10px; 
+            border: 2px solid black; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            width: 480px; 
+        }
+        #levelsMenu h3 { 
+            margin: 0 0 10px 0; 
+        }
+        #levelSelect { 
+            width: 100%; 
+            padding: 5px; 
+            font-size: 14px; 
+        }
+        #modeSelect { 
+            width: 100%; 
+            padding: 5px; 
+            font-size: 14px; 
+            margin-top: 5px; 
+        }
+        #levelStatus { 
+            margin-top: 10px; 
+            font-size: 14px; 
+        }
+        #levelTimer { 
+            margin-top: 5px; 
+            font-size: 14px; 
+        }
+        #ownerLevelsMenu { 
+            display: none; 
+            position: absolute; 
+            bottom: 50px; 
+            right: 10px; 
+            background: #2e2e4e; 
+            padding: 5px; 
+            border: 2px solid black; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            width: 200px; 
+        }
+        #ownerLevelsMenu h3 { 
+            margin: 0 0 5px 0; 
+            font-size: 14px; 
+            cursor: pointer; 
+        }
+        #levelInputs { 
+            display: none; 
+        }
+        #ownerLevelsMenu input { 
+            width: 60%; 
+            padding: 3px; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #ownerLevelsMenu select { 
+            width: 60%; 
+            padding: 3px; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #ownerLevelsMenu button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 3px; 
+            border: none; 
+            cursor: pointer; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #ownerLevelsMenu .deleteBtn { 
+            background: #ff4444; 
+            width: 20%; 
+        }
+        #levelList { 
+            margin-top: 5px; 
+            max-height: 100px; 
+            overflow-y: auto; 
+            display: none; 
+        }
+        #levelList div { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+        #includeBoss { 
+            margin: 3px 0; 
+            font-size: 12px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="gameCanvas">
+            <div id="stats">
+                Score: 0 | Coins: 0
+            </div>
+            <div id="scoreBoostDisplay">Score Boost: 100%</div>
+            <div id="highScore">High Score: 0</div>
+            <div id="spaceship">🚀</div>
+            <div id="pauseText">Paused - Press ESC to Resume</div>
+        </div>
+        <div id="shop">
+            <h3>Shop</h3>
+            <div id="coinCount">SpaceCoins: 0</div>
+            <div id="shieldCount">Shields: 🛡️ 0</div>
+            <div id="powerTimers"></div>
+            <div id="shooterLevel">Shooter Level: 0 (Auto)</div>
+            <div id="skinMenu">
+                <label for="skinSelect">Select Skin:</label>
+                <select id="skinSelect" onchange="equipSkinFromMenu(this.value)">
+                    <option value="default">Default (🚀/🪨)</option>
+                    <option value="minecraft">Minecraft (⛏️/💎)</option>
+                    <option value="music">Music (🎤/🎵/🎶)</option>
+                </select>
+            </div>
+            <div id="codeInputContainer">
+                <input type="text" id="codeInput" placeholder="Enter Code" maxlength="7">
+                <button id="submitCodeBtn" onclick="submitCode()">Submit</button>
+            </div>
+            <button id="boostBtn" class="shopBtn" onclick="buyScoreBoost()">2% Score Boost (10 Coins)</button>
+            <button id="gravityBtn" class="shopBtn">Gravity Pulse (15 Coins)</button>
+            <button id="shieldBtn" class="shopBtn">Buy Shield (5 Coins)</button>
+            <button id="shooterBtn" class="shopBtn">Shooter Lvl 1 (50 Coins)</button>
+            <button id="minecraftSkinBtn" class="shopBtn">Buy Minecraft Skin (50 Coins)</button>
+            <button id="musicSkinBtn" class="shopBtn">Buy Music Skin (250 Coins)</button>
+        </div>
+        <div id="accountControls">
+            <span id="loggedInStatus"></span>
+            <button id="loginBtn" onclick="showLoginForm()">Login</button>
+            <button id="createAccountBtn" onclick="showCreateAccountForm()">Create Account</button>
+            <button id="logoutBtn" onclick="logout()" style="display: none;">Logout</button>
+        </div>
+        <div id="accountForm">
+            <h3 id="formTitle"></h3>
+            <input type="text" id="usernameInput" placeholder="Username (no spaces)">
+            <input type="password" id="passwordInput" placeholder="Password (6+ chars)">
+            <button id="submitAccountBtn"></button>
+            <div id="accountStatus"></div>
+        </div>
+        <div id="ownerMenu">
+            <h3 onclick="toggleCodeMenu()">Owner Code Manager ▼</h3>
+            <div id="codeInputs">
+                <input type="text" id="newCodeInput" placeholder="New Code" maxlength="7">
+                <input type="number" id="newCodeReward" placeholder="Coins" min="1">
+                <button onclick="addOwnerCode()">Add Code</button>
+            </div>
+            <div id="codeList"></div>
+        </div>
+        <div id="levelsMenu">
+            <h3>Levels</h3>
+            <select id="levelSelect" onchange="startLevel(this.value)">
+                <option value="">Select a Level</option>
+            </select>
+            <select id="modeSelect" onchange="switchMode(this.value)">
+                <option value="survival">Survival</option>
+                <option value="levels">Levels</option>
+            </select>
+            <div id="levelStatus"></div>
+            <div id="levelTimer"></div>
+        </div>
+        <div id="ownerLevelsMenu">
+            <h3 onclick="toggleLevelsMenu()">Owner Level Manager ▼</h3>
+            <div id="levelInputs">
+                <input type="text" id="newLevelName" placeholder="Level Name">
+                <select id="newLevelDifficulty">
+                    <option value="EASY">EASY (1 Coin)</option>
+                    <option value="NORMAL">NORMAL (2 Coins)</option>
+                    <option value="HARD">HARD (3 Coins)</option>
+                </select>
+                <input type="number" id="newLevelTime" placeholder="Time (sec)" min="10">
+                <label><input type="checkbox" id="includeBoss"> Include Boss</label>
+                <button onclick="addOwnerLevel()">Add Level</button>
+            </div>
+            <div id="levelList"></div>
+        </div>
+    </div>
+    <p>Use WASD or LEFT/RIGHT arrow keys to dodge. Press ESC to pause/resume. Press SPACE to use a shield (if available).</p>
+
+    <!-- Audio Elements -->
+    <audio id="moveSound" src="move.mp3" preload="auto"></audio>
+    <audio id="shootSound" src="shoot.mp3" preload="auto"></audio>
+    <audio id="redeemSound" src="redeem.mp3" preload="auto"></audio>
+    <audio id="crashSound" src="crash.mp3" preload="auto"></audio>
+    <audio id="hitSound" src="hit.mp3" preload="auto"></audio>
+
+    <script>
+        // Game state
+        let score = 0;
+        let totalScore = 0;
+        let spaceCoins = 0;
+        let scoreBoost = 1; // Starts at 100%, multiplier for score
+        let shieldCount = 0;
+        let shieldActive = false;
+        let shieldTimer = 0;
+        let shipPosX = 235; // Reverted to default 500px canvas center
+        let shipPosY = 360; // Reverted to default 400px canvas bottom
+        let isGameOver = false;
+        let isPaused = false;
+        let asteroids = [];
+        let boss = null;
+        let animationFrameId = null;
+        let gravityTimer = 0;
+        let shooterLevel = 0;
+        let shooterCooldown = 0;
+        let highScore = 0;
+        let purchasedSkins = ['default'];
+        let activeSkin = 'default';
+        let usedCodes = [];
+        let completedLevels = [];
+        let isMusicJumping = false;
+        let loggedInUser = null;
+        let gameMode = 'survival';
+        let currentLevel = null;
+        let levelTimer = 0;
+
+        // Audio elements
+        const moveSound = document.getElementById('moveSound');
+        const shootSound = document.getElementById('shootSound');
+        const redeemSound = document.getElementById('redeemSound');
+        const crashSound = document.getElementById('crashSound');
+        const hitSound = document.getElementById('hitSound');
+
+        // DOM elements
+        const spaceship = document.getElementById('spaceship');
+        const gameCanvas = document.getElementById('gameCanvas');
+        const stats = document.getElementById('stats');
+        const scoreBoostDisplay = document.getElementById('scoreBoostDisplay');
+        const highScoreDisplay = document.getElementById('highScore');
+        const coinCount = document.getElementById('coinCount');
+        const shieldCountDisplay = document.getElementById('shieldCount');
+        const powerTimers = document.getElementById('powerTimers');
+        const shooterLevelDisplay = document.getElementById('shooterLevel');
+        const boostBtn = document.getElementById('boostBtn');
+        const gravityBtn = document.getElementById('gravityBtn');
+        const shieldBtn = document.getElementById('shieldBtn');
+        const shooterBtn = document.getElementById('shooterBtn');
+        const minecraftSkinBtn = document.getElementById('minecraftSkinBtn');
+        const musicSkinBtn = document.getElementById('musicSkinBtn');
+        const pauseText = document.getElementById('pauseText');
+        const skinSelect = document.getElementById('skinSelect');
+        const codeInput = document.getElementById('codeInput');
+        const submitCodeBtn = document.getElementById('submitCodeBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const createAccountBtn = document.getElementById('createAccountBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loggedInStatus = document.getElementById('loggedInStatus');
+        const accountForm = document.getElementById('accountForm');
+        const formTitle = document.getElementById('formTitle');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitAccountBtn = document.getElementById('submitAccountBtn');
+        const accountStatus = document.getElementById('accountStatus');
+        const ownerMenu = document.getElementById('ownerMenu');
+        const codeInputs = document.getElementById('codeInputs');
+        const newCodeInput = document.getElementById('newCodeInput');
+        const newCodeReward = document.getElementById('newCodeReward');
+        const codeList = document.getElementById('codeList');
+        const levelsMenu = document.getElementById('levelsMenu');
+        const levelSelect = document.getElementById('levelSelect');
+        const modeSelect = document.getElementById('modeSelect');
+        const levelStatus = document.getElementById('levelStatus');
+        const levelTimerDisplay = document.getElementById('levelTimer');
+        const ownerLevelsMenu = document.getElementById('ownerLevelsMenu');
+        const levelInputs = document.getElementById('levelInputs');
+        const newLevelName = document.getElementById('newLevelName');
+        const newLevelDifficulty = document.getElementById('newLevelDifficulty');
+        const newLevelTime = document.getElementById('newLevelTime');
+        const includeBoss = document.getElementById('includeBoss');
+        const levelList = document.getElementById('levelList');
+
+        // Code rewards
+        let codeRewards = JSON.parse(localStorage.getItem('codeRewards')) || {
+            '4A562VV': { coins: 50 },
+            'XNCK64': { coins: 25 },
+            'ASHEH7': { coins: 15 },
+            'ASD2012': { coins: 50 },
+            '45OWP4': { coins: 50 },
+            '88NVM': { coins: 25 },
+            'OWNER': { coins: 2000 }
+        };
+
+        // Levels
+        let levels = JSON.parse(localStorage.getItem('levels')) || {
+            'Level 1': { difficulty: 'EASY', time: 20, spawnRate: 0.05, hasBoss: false }
+        };
+
+        // Skin definitions
+        const skins = {
+            default: { ship: '🚀', asteroids: ['🪨'], background: '#1a1a2e', moveSpeed: 20 },
+            minecraft: { ship: '⛏️', asteroids: ['💎'], background: '#808080', moveSpeed: 20 },
+            music: { ship: '🎤', asteroids: ['🎵', '🎶'], background: '#800080', moveSpeed: 22 }
+        };
+
+        // Account management
+        let accounts = JSON.parse(localStorage.getItem('accounts')) || {};
+
+        function playSound(soundElement, soundName) {
+            if (!soundElement) {
+                console.error(`${soundName} element is null`);
+                return;
+            }
+            soundElement.currentTime = 0;
+            soundElement.play()
+                .then(() => console.log(`${soundName} played successfully`))
+                .catch(err => console.error(`Failed to play ${soundName}: ${err}`));
+        }
+
+        function showLoginForm() {
+            formTitle.textContent = "Login";
+            submitAccountBtn.textContent = "Login";
+            submitAccountBtn.onclick = login;
+            accountForm.style.display = 'block';
+            usernameInput.value = '';
+            passwordInput.value = '';
+            accountStatus.textContent = '';
+        }
+
+        function showCreateAccountForm() {
+            formTitle.textContent = "Create Account";
+            submitAccountBtn.textContent = "Create";
+            submitAccountBtn.onclick = createAccount;
+            accountForm.style.display = 'block';
+            usernameInput.value = '';
+            passwordInput.value = '';
+            accountStatus.textContent = '';
+        }
+
+        function createAccount() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (username.includes(' ')) {
+                accountStatus.textContent = "Username cannot contain spaces!";
+                return;
+            }
+            if (accounts[username]) {
+                accountStatus.textContent = "Username already taken!";
+                return;
+            }
+            if (password.length < 6) {
+                accountStatus.textContent = "Password must be at least 6 characters!";
+                return;
+            }
+
+            accounts[username] = {
+                password: password,
+                gameData: {
+                    totalScore: 0,
+                    spaceCoins: 0,
+                    scoreBoost: 1, // Ensure scoreBoost starts at 1 (100%)
+                    shieldCount: 0,
+                    shieldTimer: 0,
+                    gravityTimer: 0,
+                    shooterLevel: 0,
+                    shooterCooldown: 0,
+                    highScore: 0,
+                    purchasedSkins: ['default'],
+                    activeSkin: 'default',
+                    usedCodes: [],
+                    completedLevels: []
+                }
+            };
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            alert("Account created successfully! Please log in.");
+            accountForm.style.display = 'none';
+        }
+
+        function login() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!accounts[username]) {
+                accountStatus.textContent = "Account doesn't exist!";
+                return;
+            }
+            if (accounts[username].password !== password) {
+                accountStatus.textContent = "Incorrect password!";
+                return;
+            }
+
+            loggedInUser = username;
+            localStorage.setItem('loggedInUser', username);
+            loadGameState(accounts[username].gameData);
+            loginBtn.style.display = 'none';
+            createAccountBtn.style.display = 'none';
+            logoutBtn.style.display = 'inline';
+            loggedInStatus.textContent = `Logged in as: ${username}`;
+            accountForm.style.display = 'none';
+            updateDisplay();
+            updateOwnerMenuVisibility();
+            updateLevelsMenu();
+        }
+
+        function logout() {
+            saveGame();
+            loggedInUser = null;
+            localStorage.removeItem('loggedInUser');
+            resetGameState();
+            loginBtn.style.display = 'inline';
+            createAccountBtn.style.display = 'inline';
+            logoutBtn.style.display = 'none';
+            loggedInStatus.textContent = '';
+            updateDisplay();
+            ownerMenu.style.display = 'none';
+            ownerLevelsMenu.style.display = 'none';
+        }
+
+        function applySkin(skinName) {
+            if (skins[skinName]) {
+                spaceship.textContent = skins[skinName].ship;
+                activeSkin = skinName;
+                saveGame();
+                gameCanvas.style.background = skins[skinName].background;
+                gameCanvas.style.backgroundSize = 'cover';
+                gameCanvas.style.backgroundRepeat = 'repeat';
+                updateSkinMenu();
+            }
+        }
+
+        function equipSkinFromMenu(skinName) {
+            if (purchasedSkins.includes(skinName)) {
+                applySkin(skinName);
+            } else {
+                alert("You haven't purchased this skin yet!");
+                skinSelect.value = activeSkin;
+            }
+        }
+
+        function updateSkinMenu() {
+            skinSelect.innerHTML = '';
+            skinSelect.innerHTML += '<option value="default">Default (🚀/🪨)</option>';
+            if (purchasedSkins.includes('minecraft')) {
+                skinSelect.innerHTML += '<option value="minecraft">Minecraft (⛏️/💎)</option>';
+            }
+            if (purchasedSkins.includes('music')) {
+                skinSelect.innerHTML += '<option value="music">Music (🎤/🎵/🎶)</option>';
+            }
+            skinSelect.value = activeSkin;
+        }
+
+        function submitCode() {
+            const code = codeInput.value.trim().toUpperCase();
+            if (!code) {
+                alert("Please enter a code!");
+                return;
+            }
+            if (usedCodes.includes(code)) {
+                alert("This code has already been used!");
+                codeInput.value = '';
+                return;
+            }
+            if (codeRewards[code]) {
+                const reward = codeRewards[code];
+                if (reward.coins) {
+                    spaceCoins += reward.coins;
+                    totalScore += reward.coins * 100;
+                    alert(`Redeemed code ${code}! You got ${reward.coins} SpaceCoins.`);
+                    playSound(redeemSound, 'redeemSound');
+                }
+                usedCodes.push(code);
+                saveGame();
+                updateDisplay();
+            } else {
+                alert("Invalid code! Check your code and try again.");
+            }
+            codeInput.value = '';
+        }
+
+        function updateOwnerMenuVisibility() {
+            if (loggedInUser === 'OWNER') {
+                ownerMenu.style.display = 'block';
+                updateCodeList();
+            } else {
+                ownerMenu.style.display = 'none';
+            }
+        }
+
+        function toggleCodeMenu() {
+            const isOpen = codeInputs.style.display === 'block';
+            codeInputs.style.display = isOpen ? 'none' : 'block';
+            codeList.style.display = isOpen ? 'none' : 'block';
+            ownerMenu.querySelector('h3').textContent = `Owner Code Manager ${isOpen ? '▼' : '▲'}`;
+        }
+
+        function addOwnerCode() {
+            const code = newCodeInput.value.trim().toUpperCase();
+            const reward = parseInt(newCodeReward.value);
+            if (!code || code.length > 7 || !reward || reward < 1) {
+                alert("Enter a valid code (max 7 chars) and reward (positive number)!");
+                return;
+            }
+            if (codeRewards[code]) {
+                alert("This code already exists!");
+                return;
+            }
+            codeRewards[code] = { coins: reward };
+            localStorage.setItem('codeRewards', JSON.stringify(codeRewards));
+            newCodeInput.value = '';
+            newCodeReward.value = '';
+            updateCodeList();
+        }
+
+        function deleteOwnerCode(code) {
+            delete codeRewards[code];
+            localStorage.setItem('codeRewards', JSON.stringify(codeRewards));
+            updateCodeList();
+        }
+
+        function updateCodeList() {
+            codeList.innerHTML = '';
+            for (const [code, reward] of Object.entries(codeRewards)) {
+                const codeEntry = document.createElement('div');
+                codeEntry.innerHTML = `${code}: ${reward.coins}`;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'deleteBtn';
+                deleteBtn.onclick = () => deleteOwnerCode(code);
+                codeEntry.appendChild(deleteBtn);
+                codeList.appendChild(codeEntry);
+            }
+        }
+
+        function switchMode(mode) {
+            gameMode = mode;
+            resetGame();
+            updateDisplay();
+            if (mode === 'levels' && currentLevel) {
+                startLevel(currentLevel);
+            }
+        }
+
+        function startLevel(levelName) {
+            if (gameMode !== 'levels' || !levels[levelName]) return;
+            currentLevel = levelName;
+            levelTimer = levels[levelName].time * 60;
+            boss = null;
+            resetGame();
+            updateDisplay();
+        }
+
+        function updateLevelsMenu() {
+            levelSelect.innerHTML = '<option value="">Select a Level</option>';
+            for (const levelName of Object.keys(levels)) {
+                const option = document.createElement('option');
+                option.value = levelName;
+                option.textContent = `${levelName} (${levels[levelName].difficulty}${levels[levelName].hasBoss ? ' + Boss' : ''})`;
+                levelSelect.appendChild(option);
+            }
+            modeSelect.value = gameMode;
+        }
+
+        function updateOwnerLevelsMenuVisibility() {
+            if (loggedInUser === 'OWNER') {
+                ownerLevelsMenu.style.display = 'block';
+                updateLevelList();
+            } else {
+                ownerLevelsMenu.style.display = 'none';
+            }
+        }
+
+        function toggleLevelsMenu() {
+            const isOpen = levelInputs.style.display === 'block';
+            levelInputs.style.display = isOpen ? 'none' : 'block';
+            levelList.style.display = isOpen ? 'none' : 'block';
+            ownerLevelsMenu.querySelector('h3').textContent = `Owner Level Manager ${isOpen ? '▼' : '▲'}`;
+        }
+
+        function addOwnerLevel() {
+            const name = newLevelName.value.trim();
+            const difficulty = newLevelDifficulty.value;
+            const time = parseInt(newLevelTime.value);
+            const hasBoss = includeBoss.checked;
+            if (!name || !time || time < 10) {
+                alert("Enter a valid name and time (min 10 sec)!");
+                return;
+            }
+            if (levels[name]) {
+                alert("This level name already exists!");
+                return;
+            }
+            const spawnRate = difficulty === 'EASY' ? 0.05 : difficulty === 'NORMAL' ? 0.07 : 0.1;
+            levels[name] = { difficulty, time, spawnRate, hasBoss };
+            localStorage.setItem('levels', JSON.stringify(levels));
+            newLevelName.value = '';
+            newLevelTime.value = '';
+            includeBoss.checked = false;
+            updateLevelList();
+            updateLevelsMenu();
+        }
+
+        function deleteOwnerLevel(levelName) {
+            delete levels[levelName];
+            localStorage.setItem('levels', JSON.stringify(levels));
+            updateLevelList();
+            updateLevelsMenu();
+        }
+
+        function updateLevelList() {
+            levelList.innerHTML = '';
+            for (const [name, level] of Object.entries(levels)) {
+                const levelEntry = document.createElement('div');
+                levelEntry.innerHTML = `${name}: ${level.difficulty} (${level.time}s${level.hasBoss ? ' + Boss' : ''})`;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'deleteBtn';
+                deleteBtn.onclick = () => deleteOwnerLevel(name);
+                levelEntry.appendChild(deleteBtn);
+                levelList.appendChild(levelEntry);
+            }
+        }
+
+        function spawnBoss() {
+            if (boss || !currentLevel || !levels[currentLevel].hasBoss) return;
+            const difficulty = levels[currentLevel].difficulty;
+            const bossElement = document.createElement('div');
+            bossElement.className = 'boss';
+            bossElement.textContent = '👾';
+            bossElement.style.left = '225px'; // Center of 500px canvas
+            bossElement.style.top = '50px';
+            gameCanvas.appendChild(bossElement);
+
+            const speed = difficulty === 'EASY' ? 1 : difficulty === 'NORMAL' ? 1.5 : 2;
+            const health = difficulty === 'EASY' ? 3 : difficulty === 'NORMAL' ? 5 : 7;
+            let bossX = 225;
+            let direction = 1;
+
+            boss = { element: bossElement, speed, health, shootCooldown: 0 };
+
+            function moveBoss() {
+                if (!boss) return;
+                bossX += boss.speed * direction;
+                if (bossX <= 0 || bossX >= 450) direction *= -1; // Adjusted for 500px width
+                boss.element.style.left = bossX + 'px';
+
+                if (boss.shootCooldown <= 0) {
+                    const projectile = document.createElement('div');
+                    projectile.style.position = 'absolute';
+                    projectile.style.width = '10px';
+                    projectile.style.height = '10px';
+                    projectile.style.background = 'red';
+                    projectile.style.borderRadius = '50%';
+                    projectile.style.left = (bossX + 20) + 'px';
+                    projectile.style.top = (parseInt(boss.element.style.top) + 50) + 'px';
+                    gameCanvas.appendChild(projectile);
+
+                    let projY = parseInt(projectile.style.top);
+                    function moveProjectile() {
+                        projY += 5;
+                        projectile.style.top = projY + 'px';
+                        if (checkCollision(projectile) && !shieldActive) {
+                            playSound(crashSound, 'crashSound');
+                            endGame();
+                            projectile.remove();
+                            return;
+                        }
+                        if (projY >= 400) { // Adjusted for 400px height
+                            projectile.remove();
+                        } else {
+                            requestAnimationFrame(moveProjectile);
+                        }
+                    }
+                    requestAnimationFrame(moveProjectile);
+                    boss.shootCooldown = difficulty === 'EASY' ? 120 : difficulty === 'NORMAL' ? 90 : 60;
+                } else {
+                    boss.shootCooldown--;
+                }
+            }
+
+            boss.move = moveBoss;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                isPaused = !isPaused;
+                pauseText.style.display = isPaused ? 'block' : 'none';
+                if (!isPaused && !isGameOver) startGameLoop();
+                return;
+            }
+            if (isGameOver || isPaused) return;
+            const moveSpeed = skins[activeSkin].moveSpeed;
+            if ((e.key === 'ArrowLeft' || e.key === 'a') && shipPosX > 0) {
+                shipPosX -= moveSpeed;
+                playSound(moveSound, 'moveSound');
+            }
+            if ((e.key === 'ArrowRight' || e.key === 'd') && shipPosX < 460) { // Adjusted for 500px width
+                shipPosX += moveSpeed;
+                playSound(moveSound, 'moveSound');
+            }
+            if (e.key === 'w' && activeSkin === 'music' && shipPosY > 335) { // Adjusted for 400px height
+                shipPosY = 335;
+                isMusicJumping = true;
+                playSound(moveSound, 'moveSound');
+            }
+            if (e.key === 's' && activeSkin === 'music' && shipPosY < 360) { // Adjusted for 400px height
+                shipPosY += 25;
+                playSound(moveSound, 'moveSound');
+            }
+            if (e.key === ' ' && shieldCount > 0 && !shieldActive) {
+                useShield();
+            }
+            spaceship.style.left = Math.max(0, Math.min(shipPosX, 460)) + 'px';
+            spaceship.style.top = shipPosY + 'px';
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'w' && activeSkin === 'music' && isMusicJumping) {
+                shipPosY = 360;
+                isMusicJumping = false;
+                spaceship.style.top = shipPosY + 'px';
+            }
+        });
+
+        function buyScoreBoost() {
+            if (spaceCoins >= 10) {
+                spaceCoins -= 10;
+                totalScore -= 1000; // Reflect cost in total score
+                if (totalScore < 0) totalScore = 0;
+                scoreBoost += 0.02; // Increase by 2% (0.02)
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                console.log(`Score Boost updated to: ${scoreBoost * 100}%`); // Debug log
+            } else {
+                alert("Not enough SpaceCoins! Need 10 for Score Boost.");
+            }
+        }
+
+        gravityBtn.addEventListener('click', () => {
+            if (spaceCoins >= 15 && gravityTimer <= 0) {
+                spaceCoins -= 15;
+                totalScore -= 1500;
+                if (totalScore < 0) totalScore = 0;
+                gravityTimer = 40 * 60;
+                startPowerTimer('Gravity Pulse', gravityTimer / 60);
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+            } else if (gravityTimer > 0) {
+                alert("Gravity Pulse already active!");
+            } else {
+                alert("Not enough SpaceCoins! Need 15 for Gravity Pulse.");
+            }
+        });
+
+        shieldBtn.addEventListener('click', () => {
+            if (spaceCoins >= 5) {
+                spaceCoins -= 5;
+                totalScore -= 500;
+                if (totalScore < 0) totalScore = 0;
+                shieldCount++;
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+            } else {
+                alert("Not enough SpaceCoins! Need 5 for a Shield.");
+            }
+        });
+
+        shooterBtn.addEventListener('click', () => {
+            if (shooterLevel === 0 && spaceCoins >= 50) {
+                spaceCoins -= 50;
+                totalScore -= 5000;
+                if (totalScore < 0) totalScore = 0;
+                shooterLevel = 1;
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                alert("Shooter Level 1 unlocked! Shoots 1 ammo automatically every 3 seconds.");
+            } else if (shooterLevel === 1 && spaceCoins >= 75) {
+                spaceCoins -= 75;
+                totalScore -= 7500;
+                if (totalScore < 0) totalScore = 0;
+                shooterLevel = 2;
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                alert("Shooter Level 2 unlocked! Shoots 2 ammo automatically every 3 seconds.");
+            } else if (shooterLevel === 2 && spaceCoins >= 125) {
+                spaceCoins -= 125;
+                totalScore -= 12500;
+                if (totalScore < 0) totalScore = 0;
+                shooterLevel = 3;
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                alert("Shooter Level 3 unlocked! Shoots 3 ammo automatically every 3 seconds.");
+            } else if (shooterLevel === 3) {
+                alert("Shooter already at max level (Level 3)!");
+            } else {
+                alert(`Not enough SpaceCoins! Need ${shooterLevel === 0 ? 50 : shooterLevel === 1 ? 75 : 125} for Shooter Level ${shooterLevel + 1}.`);
+            }
+        });
+
+        minecraftSkinBtn.addEventListener('click', () => {
+            if (spaceCoins >= 50 && !purchasedSkins.includes('minecraft')) {
+                spaceCoins -= 50;
+                totalScore -= 5000;
+                if (totalScore < 0) totalScore = 0;
+                purchasedSkins.push('minecraft');
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                updateSkinMenu();
+                alert("Minecraft Skin purchased! Select it from the menu.");
+            } else if (purchasedSkins.includes('minecraft')) {
+                alert("You already own the Minecraft Skin!");
+            } else {
+                alert("Not enough SpaceCoins! Need 50 for Minecraft Skin.");
+            }
+        });
+
+        musicSkinBtn.addEventListener('click', () => {
+            if (spaceCoins >= 250 && !purchasedSkins.includes('music')) {
+                spaceCoins -= 250;
+                totalScore -= 25000;
+                if (totalScore < 0) totalScore = 0;
+                purchasedSkins.push('music');
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+                updateDisplay();
+                updateSkinMenu();
+                alert("Music Skin purchased! Select it from the menu.");
+            } else if (purchasedSkins.includes('music')) {
+                alert("You already own the Music Skin!");
+            } else {
+                alert("Not enough SpaceCoins! Need 250 for Music Skin.");
+            }
+        });
+
+        function useShield() {
+            if (shieldCount > 0 && !shieldActive) {
+                shieldCount--;
+                shieldActive = true;
+                shieldTimer = 10 * 60;
+                startPowerTimer('Shield', shieldTimer / 60);
+                saveGame();
+                updateDisplay();
+            }
+        }
+
+        function shootAmmo() {
+            if (shooterLevel > 0 && shooterCooldown <= 0) {
+                const ammoCount = shooterLevel;
+                const spreadAngles = shooterLevel === 1 ? [0] : shooterLevel === 2 ? [-10, 10] : [-15, 0, 15];
+                for (let i = 0; i < ammoCount; i++) {
+                    const ammo = document.createElement('div');
+                    ammo.style.position = 'absolute';
+                    ammo.style.width = '10px';
+                    ammo.style.height = '10px';
+                    ammo.style.background = 'yellow';
+                    ammo.style.borderRadius = '50%';
+                    ammo.style.left = (shipPosX + 10) + 'px';
+                    ammo.style.top = shipPosY + 'px';
+                    gameCanvas.appendChild(ammo);
+
+                    const angle = spreadAngles[i] * Math.PI / 180;
+                    const speedX = Math.sin(angle) * 5;
+                    const speedY = -Math.cos(angle) * 5;
+
+                    playSound(shootSound, 'shootSound');
+
+                    function moveAmmo() {
+                        let left = parseFloat(ammo.style.left) + speedX;
+                        let top = parseFloat(ammo.style.top) + speedY;
+                        ammo.style.left = left + 'px';
+                        ammo.style.top = top + 'px';
+
+                        asteroids.forEach((asteroid, index) => {
+                            const astRect = asteroid.element.getBoundingClientRect();
+                            const ammoRect = ammo.getBoundingClientRect();
+                            if (
+                                ammoRect.left < astRect.right &&
+                                ammoRect.right > astRect.left &&
+                                ammoRect.top < astRect.bottom &&
+                                ammoRect.bottom > astRect.top
+                            ) {
+                                asteroid.element.remove();
+                                asteroids.splice(index, 1);
+                                ammo.remove();
+                                playSound(hitSound, 'hitSound');
+                                return;
+                            }
+                        });
+
+                        if (boss && boss.element) {
+                            const bossRect = boss.element.getBoundingClientRect();
+                            const ammoRect = ammo.getBoundingClientRect();
+                            if (
+                                ammoRect.left < bossRect.right &&
+                                ammoRect.right > bossRect.left &&
+                                ammoRect.top < bossRect.bottom &&
+                                ammoRect.bottom > bossRect.top
+                            ) {
+                                boss.health--;
+                                ammo.remove();
+                                playSound(hitSound, 'hitSound');
+                                if (boss.health <= 0) {
+                                    boss.element.remove();
+                                    boss = null;
+                                    completeLevel();
+                                    return;
+                                }
+                            }
+                        }
+
+                        if (top <= 0 || left < 0 || left > 490) { // Adjusted for 500px width
+                            ammo.remove();
+                        } else {
+                            requestAnimationFrame(moveAmmo);
+                        }
+                    }
+                    requestAnimationFrame(moveAmmo);
+                }
+                shooterCooldown = 180;
+                startPowerTimer('Shooter', 3);
+                saveGame();
+            }
+        }
+
+        function spawnAsteroid() {
+            if (isGameOver || isPaused || asteroids.length >= 10 || boss) return;
+            const spawnRate = gameMode === 'levels' && currentLevel ? levels[currentLevel].spawnRate : 0.05;
+            if (Math.random() < spawnRate) {
+                const asteroid = document.createElement('div');
+                asteroid.className = 'asteroid';
+                const asteroidEmojis = skins[activeSkin].asteroids;
+                asteroid.textContent = asteroidEmojis[Math.floor(Math.random() * asteroidEmojis.length)];
+                asteroid.style.left = Math.floor(Math.random() * 475) + 'px'; // Adjusted for 500px width
+                asteroid.style.top = '-30px';
+                gameCanvas.appendChild(asteroid);
+                asteroids.push({ element: asteroid, speed: gravityTimer > 0 ? 1 : 2 });
+            }
+        }
+
+        function spawnBoss() {
+            if (boss || !currentLevel || !levels[currentLevel].hasBoss) return;
+            const difficulty = levels[currentLevel].difficulty;
+            const bossElement = document.createElement('div');
+            bossElement.className = 'boss';
+            bossElement.textContent = '👾';
+            bossElement.style.left = '225px'; // Center of 500px canvas
+            bossElement.style.top = '50px';
+            gameCanvas.appendChild(bossElement);
+
+            const speed = difficulty === 'EASY' ? 1 : difficulty === 'NORMAL' ? 1.5 : 2;
+            const health = difficulty === 'EASY' ? 3 : difficulty === 'NORMAL' ? 5 : 7;
+            let bossX = 225;
+            let direction = 1;
+
+            boss = { element: bossElement, speed, health, shootCooldown: 0 };
+
+            function moveBoss() {
+                if (!boss) return;
+                bossX += boss.speed * direction;
+                if (bossX <= 0 || bossX >= 450) direction *= -1; // Adjusted for 500px width
+                boss.element.style.left = bossX + 'px';
+
+                if (boss.shootCooldown <= 0) {
+                    const projectile = document.createElement('div');
+                    projectile.style.position = 'absolute';
+                    projectile.style.width = '10px';
+                    projectile.style.height = '10px';
+                    projectile.style.background = 'red';
+                    projectile.style.borderRadius = '50%';
+                    projectile.style.left = (bossX + 20) + 'px';
+                    projectile.style.top = (parseInt(boss.element.style.top) + 50) + 'px';
+                    gameCanvas.appendChild(projectile);
+
+                    let projY = parseInt(projectile.style.top);
+                    function moveProjectile() {
+                        projY += 5;
+                        projectile.style.top = projY + 'px';
+                        if (checkCollision(projectile) && !shieldActive) {
+                            playSound(crashSound, 'crashSound');
+                            endGame();
+                            projectile.remove();
+                            return;
+                        }
+                        if (projY >= 400) { // Adjusted for 400px height
+                            projectile.remove();
+                        } else {
+                            requestAnimationFrame(moveProjectile);
+                        }
+                    }
+                    requestAnimationFrame(moveProjectile);
+                    boss.shootCooldown = difficulty === 'EASY' ? 120 : difficulty === 'NORMAL' ? 90 : 60;
+                } else {
+                    boss.shootCooldown--;
+                }
+            }
+
+            boss.move = moveBoss;
+        }
+
+        function gameLoop() {
+            if (isGameOver || isPaused) return;
+
+            if (gameMode === 'survival') {
+                score += 0.1 * scoreBoost; // Apply scoreBoost multiplier
+                totalScore += 0.1 * scoreBoost; // Apply to total score too
+                let newCoins = Math.floor(totalScore / 100);
+                if (newCoins > spaceCoins) {
+                    spaceCoins = newCoins;
+                    saveGame();
+                }
+            } else if (gameMode === 'levels' && currentLevel) {
+                levelTimer--;
+                if (levelTimer <= 0) {
+                    if (levels[currentLevel].hasBoss) {
+                        spawnBoss();
+                    } else {
+                        completeLevel();
+                        return;
+                    }
+                }
+            }
+
+            if (shieldActive) {
+                shieldTimer--;
+                updatePowerTimer('Shield', shieldTimer / 60);
+                if (shieldTimer <= 0) {
+                    shieldActive = false;
+                    updatePowerTimer('Shield', 0);
+                    updateDisplay();
+                }
+            }
+
+            if (gravityTimer > 0) {
+                gravityTimer--;
+                asteroids.forEach(a => a.speed = 1);
+                if (boss) boss.speed = 1;
+                updatePowerTimer('Gravity Pulse', gravityTimer / 60);
+                if (gravityTimer <= 0) {
+                    asteroids.forEach(a => a.speed = 2);
+                    if (boss) boss.speed = levels[currentLevel].difficulty === 'EASY' ? 1 : levels[currentLevel].difficulty === 'NORMAL' ? 1.5 : 2;
+                    updatePowerTimer('Gravity Pulse', 0);
+                    alert("Gravity Pulse expired!");
+                }
+            }
+
+            if (shooterLevel > 0 && shooterCooldown <= 0) {
+                shootAmmo();
+            }
+            if (shooterCooldown > 0) {
+                shooterCooldown--;
+                updatePowerTimer('Shooter', shooterCooldown / 60);
+                if (shooterCooldown <= 0) {
+                    updatePowerTimer('Shooter', 0);
+                }
+            }
+
+            if (gameMode === 'survival' && Math.floor(score) > highScore) {
+                highScore = Math.floor(score);
+                saveGame();
+            }
+
+            if (boss) {
+                boss.move();
+            }
+
+            updateDisplay();
+            spawnAsteroid();
+
+            asteroids = asteroids.filter(a => {
+                const top = parseInt(a.element.style.top) + a.speed;
+                a.element.style.top = top + 'px';
+
+                if (checkCollision(a.element) && !shieldActive) {
+                    playSound(crashSound, 'crashSound');
+                    endGame();
+                    return false;
+                }
+
+                if (top >= 400) { // Adjusted for 400px height
+                    a.element.remove();
+                    return false;
+                }
+                return true;
+            });
+
+            if (boss && checkCollision(boss.element) && !shieldActive) {
+                playSound(crashSound, 'crashSound');
+                endGame();
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function completeLevel() {
+            if (!completedLevels.includes(currentLevel)) {
+                const reward = levels[currentLevel].difficulty === 'EASY' ? 1 : levels[currentLevel].difficulty === 'NORMAL' ? 2 : 3;
+                spaceCoins += reward;
+                completedLevels.push(currentLevel);
+                alert(`Level ${currentLevel} completed! You earned ${reward} SpaceCoins.`);
+                playSound(redeemSound, 'redeemSound');
+                saveGame();
+            } else {
+                alert(`Level ${currentLevel} completed! (Already rewarded)`);
+            }
+            currentLevel = null;
+            resetGame();
+        }
+
+        function startPowerTimer(powerName, durationSeconds) {
+            const timerElement = document.createElement('div');
+            timerElement.id = `${powerName.toLowerCase()}Timer`;
+            timerElement.textContent = `${powerName}: ${Math.ceil(durationSeconds)}s`;
+            powerTimers.appendChild(timerElement);
+            updatePowerTimer(powerName, durationSeconds);
+        }
+
+        function updatePowerTimer(powerName, seconds) {
+            const timerElement = document.getElementById(`${powerName.toLowerCase()}Timer`);
+            if (seconds > 0) {
+                if (timerElement) {
+                    timerElement.textContent = `${powerName}: ${Math.ceil(seconds)}s`;
+                } else {
+                    startPowerTimer(powerName, seconds);
+                }
+            } else {
+                if (timerElement) {
+                    timerElement.remove();
+                }
+            }
+        }
+
+        function checkCollision(element) {
+            const shipRect = spaceship.getBoundingClientRect();
+            const elemRect = element.getBoundingClientRect();
+            const shipLeft = shipRect.left + 5;
+            const shipRight = shipRect.right - 5;
+            const shipTop = shipRect.top + 5;
+            const shipBottom = shipRect.bottom - 5;
+
+            return (
+                shipLeft < elemRect.right &&
+                shipRight > elemRect.left &&
+                shipTop < elemRect.bottom &&
+                shipBottom > elemRect.top
+            );
+        }
+
+        function saveGame() {
+            const gameData = {
+                totalScore,
+                spaceCoins,
+                scoreBoost, // Ensure scoreBoost is saved
+                shieldCount,
+                shieldTimer,
+                gravityTimer,
+                shooterLevel,
+                shooterCooldown,
+                highScore,
+                purchasedSkins,
+                activeSkin,
+                usedCodes,
+                completedLevels
+            };
+            if (loggedInUser) {
+                accounts[loggedInUser].gameData = gameData;
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                console.log(`Saved game state - Score Boost: ${scoreBoost * 100}%`); // Debug log
+            }
+        }
+
+        function loadGameState(data) {
+            totalScore = data.totalScore || 0;
+            spaceCoins = data.spaceCoins || 0;
+            scoreBoost = data.scoreBoost || 1; // Ensure loading correct boost
+            shieldCount = data.shieldCount || 0;
+            shieldTimer = data.shieldTimer || 0;
+            if (shieldTimer > 0) {
+                shieldActive = true;
+                startPowerTimer('Shield', shieldTimer / 60);
+            }
+            gravityTimer = data.gravityTimer || 0;
+            if (gravityTimer > 0) {
+                startPowerTimer('Gravity Pulse', gravityTimer / 60);
+            }
+            shooterLevel = data.shooterLevel || 0;
+            shooterCooldown = data.shooterCooldown || 0;
+            if (shooterCooldown > 0) {
+                startPowerTimer('Shooter', shooterCooldown / 60);
+            }
+            highScore = data.highScore || 0;
+            purchasedSkins = data.purchasedSkins || ['default'];
+            activeSkin = data.activeSkin || 'default';
+            usedCodes = data.usedCodes || [];
+            completedLevels = data.completedLevels || [];
+            applySkin(activeSkin);
+            console.log(`Loaded game state - Score Boost: ${scoreBoost * 100}%`); // Debug log
+        }
+
+        function resetGameState() {
+            score = 0;
+            totalScore = 0;
+            spaceCoins = 0;
+            scoreBoost = 1; // Reset to 100%
+            shieldCount = 0;
+            shieldActive = false;
+            shieldTimer = 0;
+            gravityTimer = 0;
+            shooterLevel = 0;
+            shooterCooldown = 0;
+            highScore = 0;
+            purchasedSkins = ['default'];
+            activeSkin = 'default';
+            usedCodes = [];
+            completedLevels = [];
+            gameMode = 'survival';
+            currentLevel = null;
+            levelTimer = 0;
+            boss = null;
+            applySkin(activeSkin);
+        }
+
+        function updateDisplay() {
+            if (gameMode === 'survival') {
+                stats.textContent = `Score: ${Math.floor(score)} | Coins: ${spaceCoins}`;
+                scoreBoostDisplay.textContent = `Score Boost: ${(scoreBoost * 100).toFixed(0)}%`;
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
+                levelTimerDisplay.textContent = '';
+            } else if (gameMode === 'levels' && currentLevel) {
+                stats.textContent = `Level: ${currentLevel} | Coins: ${spaceCoins}`;
+                scoreBoostDisplay.textContent = boss ? `Boss Health: ${boss.health}` : `Time Left: ${Math.ceil(levelTimer / 60)}s`;
+                highScoreDisplay.textContent = completedLevels.includes(currentLevel) ? 'Completed' : 'Not Completed';
+                levelTimerDisplay.textContent = boss ? `Boss Active` : `Time Left: ${Math.ceil(levelTimer / 60)}s`;
+            } else {
+                stats.textContent = `Coins: ${spaceCoins}`;
+                scoreBoostDisplay.textContent = '';
+                highScoreDisplay.textContent = '';
+                levelTimerDisplay.textContent = '';
+            }
+            coinCount.textContent = `SpaceCoins: ${spaceCoins}`;
+            shieldCountDisplay.textContent = `Shields: 🛡️ ${shieldCount}`;
+            shooterLevelDisplay.textContent = `Shooter Level: ${shooterLevel} (Auto)`;
+            boostBtn.disabled = spaceCoins < 10;
+            gravityBtn.disabled = spaceCoins < 15 || gravityTimer > 0;
+            shieldBtn.disabled = spaceCoins < 5;
+            shooterBtn.disabled = shooterLevel === 3 || (shooterLevel === 0 && spaceCoins < 50) || (shooterLevel === 1 && spaceCoins < 75) || (shooterLevel === 2 && spaceCoins < 125);
+            if (shooterLevel === 0) shooterBtn.textContent = `Shooter Lvl 1 (50 Coins)`;
+            else if (shooterLevel === 1) shooterBtn.textContent = `Shooter Lvl 2 (Upgrade for 75 Coins)`;
+            else if (shooterLevel === 2) shooterBtn.textContent = `Shooter Lvl 3 (Upgrade for 125 Coins)`;
+            else shooterBtn.textContent = `Shooter (Max Level)`;
+            minecraftSkinBtn.disabled = spaceCoins < 50 || purchasedSkins.includes('minecraft');
+            musicSkinBtn.disabled = spaceCoins < 250 || purchasedSkins.includes('music');
+            submitCodeBtn.disabled = false;
+            levelStatus.textContent = currentLevel ? `Goal: Survive ${levels[currentLevel].time} seconds${levels[currentLevel].hasBoss ? ' + Defeat Boss' : ''}` : '';
+        }
+
+        function endGame() {
+            isGameOver = true;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            if (boss) {
+                boss.element.remove();
+                boss = null;
+            }
+            playSound(crashSound, 'crashSound');
+            saveGame();
+            resetGame();
+        }
+
+        function resetGame() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            isGameOver = false;
+            isPaused = false;
+            score = 0;
+            shipPosX = 235;
+            shipPosY = 360;
+            isMusicJumping = false;
+            spaceship.style.left = shipPosX + 'px';
+            spaceship.style.top = shipPosY + 'px';
+            spaceship.style.width = '30px';
+            spaceship.style.height = '30px';
+            spaceship.style.padding = '0';
+            spaceship.style.margin = '0';
+            asteroids.forEach(a => a.element.remove());
+            asteroids = [];
+            if (boss) {
+                boss.element.remove();
+                boss = null;
+            }
+            const leftoverRocks = gameCanvas.getElementsByClassName('asteroid');
+            while (leftoverRocks.length > 0) {
+                leftoverRocks[0].remove();
+            }
+            const leftoverBosses = gameCanvas.getElementsByClassName('boss');
+            while (leftoverBosses.length > 0) {
+                leftoverBosses[0].remove();
+            }
+            gravityTimer = 0;
+            shieldActive = false;
+            shieldTimer = 0;
+            shooterCooldown = 0;
+            updatePowerTimer('Shield', 0);
+            updatePowerTimer('Gravity Pulse', 0);
+            updatePowerTimer('Shooter', 0);
+            pauseText.style.display = 'none';
+            if (gameMode === 'levels' && currentLevel) {
+                levelTimer = levels[currentLevel].time * 60;
+            }
+            updateDisplay();
+            startGameLoop();
+        }
+
+        function startGameLoop() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function initializeGame() {
+            const savedUser = localStorage.getItem('loggedInUser');
+            if (savedUser && accounts[savedUser]) {
+                loggedInUser = savedUser;
+                loadGameState(accounts[savedUser].gameData);
+                loginBtn.style.display = 'none';
+                createAccountBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline';
+                loggedInStatus.textContent = `Logged in as: ${savedUser}`;
+                updateOwnerMenuVisibility();
+                updateOwnerLevelsMenuVisibility();
+            } else {
+                resetGameState();
+            }
+            updateDisplay();
+            updateSkinMenu();
+            updateLevelsMenu();
+
+            [moveSound, shootSound, redeemSound, crashSound, hitSound].forEach(sound => {
+                sound.load();
+                sound.onloadeddata = () => console.log(`${sound.id} loaded successfully`);
+                sound.onerror = () => console.error(`Failed to load ${sound.id} from ${sound.src}`);
+            });
+
+            startGameLoop();
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>
